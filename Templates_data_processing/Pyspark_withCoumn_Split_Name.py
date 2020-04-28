@@ -13,3 +13,15 @@ voter_df = voter_df.drop('splits')
 
 # Show the voter_df DataFrame
 voter_df.show()
+
+
+
+# Add a column to voter_df named random_val with the results of the F.rand() method for any voter with the title Councilmember.
+# Add a column to voter_df for a voter based on their position
+voter_df = voter_df.withColumn('random_val',
+                                when(voter_df.TITLE == 'Councilmember', F.rand())
+                               .when(voter_df.TITLE == 'Mayor', 2)
+                               .otherwise(0))
+
+# Use the .filter() clause with random_val
+voter_df.filter(voter_df.random_val == 0).show()
