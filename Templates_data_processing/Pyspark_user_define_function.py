@@ -20,3 +20,6 @@ voter_df = voter_df.withColumn('first_and_middle_name', udfFirstAndMiddle(voter_
 voter_df = voter_df.drop('first_name')
 voter_df = voter_df.drop('splits')
 voter_df.show()
+
+
+
