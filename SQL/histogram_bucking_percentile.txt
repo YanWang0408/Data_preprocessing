@@ -1,0 +1,70 @@
+# Average Revenue Per User - ARPU
+WITH kpi AS (SELECT user_id, SUM(m.meal_price * o.order_quantity) AS revenue
+  FROM meals AS m
+  JOIN orders AS o ON m.meal_id = o.meal_id
+  GROUP BY user_id)
+
+SELECT ROUND(avg(revenue) :: numeric, 2) AS arpu
+FROM kpi;
+
+WITH kpi AS (SELECT DATE_TRUNC('week', order_date) :: DATE AS delivr_week,
+    sum(m.meal_price * o.order_quantity) AS revenue,
+    count(distinct(user_id)) AS users
+  FROM meals AS m
+  JOIN orders AS o ON m.meal_id = o.meal_id
+  GROUP BY delivr_week)
+
+SELECT delivr_week, ROUND(revenue :: NUMERIC / greatest(users, 1), 2) AS arpu
+FROM kpi
+ORDER BY delivr_week ASC;
+
+#Histogram
+WITH user_revenues AS (SELECT user_id, sum(m.meal_price * o.order_quantity) AS revenue
+  FROM meals AS m
+  JOIN orders AS o ON m.meal_id = o.meal_id
+  GROUP BY user_id)
+
+SELECT round(revenue :: NUMERIC, -2) AS revenue_100, count(distinct user_id) AS users
+FROM user_revenues
+GROUP BY revenue_100
+ORDER BY revenue_100 ASC;
+
+# Bucketing
+WITH user_revenues AS (SELECT user_id, sum(m.meal_price * o.order_quantity) AS revenue
+  FROM meals AS m
+  JOIN orders AS o ON m.meal_id = o.meal_id
+  GROUP BY user_id)
+
+SELECT 
+  CASE
+    WHEN revenue < 150 THEN 'Low-revenue users'
+    WHEN revenue < 300 THEN 'Mid-revenue users'
+    ELSE 'High-revenue users'
+  END AS revenue_group, COUNT(DISTINCT user_id) AS users
+FROM user_revenues
+GROUP BY revenue_group;
+
+# Percentiles
+WITH user_revenues AS (SELECT user_id, sum(m.meal_price * o.order_quantity) AS revenue
+  FROM meals AS m
+  JOIN orders AS o ON m.meal_id = o.meal_id
+  GROUP BY user_id)
+
+SELECT
+  ROUND(
+    percentile_cont(0.25) within group (order by revenue ASC) :: numeric,
+  2) AS revenue_p25,
+  ROUND(
+    percentile_cont(0.50) within group (order by revenue ASC) :: numeric,
+  2) AS revenue_p50,
+  ROUND(
+    percentile_cont(0.75) within group (order by revenue ASC) :: numeric,
+  2) AS revenue_p75,
+  ROUND(avg(revenue) :: numeric, 2) AS avg_revenue
+FROM user_revenues;
+
+
+SELECT count(distinct user_id) AS users
+FROM user_revenues
+CROSS JOIN quartiles
+WHERE revenue :: NUMERIC >= revenue_p25 AND revenue :: NUMERIC <= revenue_p75;
