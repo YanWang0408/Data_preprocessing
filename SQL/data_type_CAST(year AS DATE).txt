@@ -1,0 +1,20 @@
+#Identifying data types
+SELECT COLUMN_NAME, DATA_TYPE
+FROM information_schema.columns
+WHERE table_name = 'country_stats';
+
+# Character  to float
+---SELECT AVG(pop_in_millions) AS avg_population
+SELECT AVG(CAST(pop_in_millions AS float)) AS avg_population
+FROM country_stats;
+
+
+#DATE_PART DATE_TRUNC
+SELECT  year,
+    DATE_PART('decade', CAST(year AS DATE)) AS decade,
+    DATE_TRUNC('decade', CAST(year AS DATE)) AS decade_truncated,
+    sum(gdp) AS world_gdp
+FROM country_stats
+GROUP BY year
+ORDER BY year desc;
+
