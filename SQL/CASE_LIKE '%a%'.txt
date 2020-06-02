@@ -1,10 +1,10 @@
 # CASE
 SELECT  name,
-                    CASE 
-                             WHEN gender = 'F' AND height >= 175   THEN   'Tall Female' 
-	     WHEN gender = 'M' AND height >= 190 THEN 'Tall Male' 
-	     ELSE 'Other'
-                    END AS segment
+        CASE 
+        WHEN gender = 'F' AND height >= 175   THEN   'Tall Female' 
+	WHEN gender = 'M' AND height >= 190 THEN 'Tall Male' 
+	ELSE 'Other'
+        END AS segment
 FROM athletes;
 
 # CASE - BMI
