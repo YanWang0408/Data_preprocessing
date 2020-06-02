@@ -1,0 +1,40 @@
+# Union
+SELECT sport, count(distinct event) AS events
+FROM summer_games
+group by sport
+UNION
+SELECT sport, count(distinct event) AS events
+FROM winter_games
+group by sport
+order by events desc;
+
+# More robust way to explore data is exploring with queries, NOT JUST TOP ROWS
+
+# JOIN then UNION
+SELECT  'summer' AS season,   country,  count(distinct event) AS events
+FROM summer_games AS s
+JOIN countries AS c
+ON s.country_id = c.id
+GROUP BY country
+
+union all
+
+SELECT  'winter' AS season,  country,  count(distinct event) AS events
+FROM winter_games AS w
+JOIN countries AS c
+ON w.country_id = c.id
+GROUP BY country
+ORDER BY events desc;
+
+# UNION then JOIN
+SELECT  season,   country,  COUNT(DISTINCT event) AS events
+FROM
+    (SELECT   'summer' AS season,  country_id,  event
+    FROM summer_games
+    UNION ALL
+    SELECT  	'winter' AS season,  country_id,  event
+    FROM winter_games) AS subquery
+JOIN countries AS c
+ON subquery.country_id = c.id
+GROUP BY season, country
+ORDER BY events DESC;
