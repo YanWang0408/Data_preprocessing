@@ -18,3 +18,14 @@ FROM country_stats
 GROUP BY year
 ORDER BY year desc;
 
+SELECT SUM(gold_medals) AS gold_medals
+FROM
+	(SELECT 
+     	w.country_id, 
+     	SUM(gold) AS gold_medals, 
+     	AVG(gdp) AS avg_gdp
+    FROM winter_games AS w
+    JOIN country_stats AS c
+    -- Update the subquery to join on a second field
+    ON c.country_id = w.country_id AND w.year = CAST(c.year AS date)
+    GROUP BY w.country_id) AS subquery;
