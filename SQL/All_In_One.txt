@@ -1,0 +1,37 @@
+SELECT  DATE_PART('month', date) AS month, country_id,  SUM(views) AS month_views,
+  LAG(SUM(views)) OVER (PARTITION BY country_id ORDER BY DATE_PART('month', date)) AS previous_month_views,
+   SUM(views) / LAG(SUM(views)) OVER (PARTITION BY country_id ORDER BY DATE_PART('month', date)) - 1 AS perc_change
+FROM web_data
+WHERE date <= '2018-05-31'
+GROUP BY month, country_id;
+ 
+
+
+SELECT   date,  weekly_avg,
+    LAG(weekly_avg,7) OVER (ORDER BY date) AS weekly_avg_previous,
+    weekly_avg / LAG(weekly_avg,7) OVER (ORDER BY date) - 1 as perc_change
+FROM
+  (SELECT
+      date,
+      SUM(views) AS daily_views,
+      AVG(SUM(views)) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS weekly_avg
+  FROM web_data
+  GROUP BY date) AS subquery
+ORDER BY date DESC;
+
+
+
+SELECT  region,  AVG(height) AS avg_tallest,   SUM(gdp)/SUM(SUM(gdp)) OVER () AS perc_world_gdp    
+FROM countries AS c
+JOIN
+    (SELECT  country_id,  height, 
+                          ROW_NUMBER() OVER (PARTITION BY country_id ORDER BY height DESC) AS row_num
+    FROM winter_games AS w 
+    JOIN athletes AS a ON w.athlete_id = a.id
+    GROUP BY country_id, height
+    ORDER BY country_id, height DESC) AS subquery
+ON c.id = subquery.country_id
+JOIN country_stats AS cs 
+ON cs.country_id = c.id
+WHERE row_num = 1
+GROUP BY region;
