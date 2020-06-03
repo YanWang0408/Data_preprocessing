@@ -1,0 +1,63 @@
+#replace
+SELECT  region,  replace(replace(region, '&', 'and'), '.', '') AS character_swap_and_remove
+FROM countries
+WHERE region = 'LATIN AMER. & CARIB'
+GROUP BY region;
+
+# trim and replace
+SELECT  replace(TRIM(event), '-', '') AS event_fixed,  COUNT(DISTINCT athlete_id) AS athletes
+FROM summer_games_messy
+GROUP BY event_fixed;
+
+#NULL
+#COALESCE
+SELECT  athlete_id,  AVG(coalesce(gold, 0)) AS avg_golds,
+    COUNT(event) AS total_events, 
+    SUM(gold) AS gold_medals
+FROM summer_games
+GROUP BY athlete_id
+ORDER BY total_events DESC, athlete_id;
+
+select COALESCE(region, 'Independent Athletes') AS region, count(distinct athletes_id) AS athletes
+from summer-GAMES;
+
+select coalesce(home, 0) + coalesce(away, 0) AS total_goals
+from soccer_games;
+
+SELECT SUM(CASE WHEN country IS NULL THEN 1 ELSE 0 END) / SUM(1.00)
+FROM orders;
+
+SELECT SUM(CASE WHEN country IS NULL THEN revenue ELSE 0 END) / SUM(revenue)
+FROM orders;
+
+#Duplication
+# 1. Remove aggregations
+# 2. Add field to JOIN statement
+# 3. Rollup using subquery
+SELECT  c.countrysum(coalesce(bronze, 0) + coalesce(silver,0) +coalesce(gold, 0)) AS medals
+FROM summer_games AS s
+JOIN countries AS c
+ON s.country_id = c.id
+GROUP BY c.country
+ORDER BY medals DESC;
+
+
+#ALL IN ONE
+SELECT 
+left(replace(upper(trim(c.country)), '.', ''), 3) as country_code,
+pop_in_millions,
+SUM(COALESCE(bronze,0) + COALESCE(silver,0) + COALESCE(gold,0)) AS medals,
+SUM(COALESCE(bronze,0) + COALESCE(silver,0) + COALESCE(gold,0)) / CAST(cs.pop_in_millions AS float) AS medals_per_million
+
+FROM summer_games AS s
+JOIN countries AS c 
+ON s.country_id = c.id
+JOIN country_stats AS cs 
+
+ON s.country_id = cs.country_id AND s.year = CAST(cs.year AS date)
+
+WHERE cs.pop_in_millions is not null
+
+GROUP BY c.country, pop_in_millions
+ORDER BY medals_per_million desc
+LIMIT 25;
