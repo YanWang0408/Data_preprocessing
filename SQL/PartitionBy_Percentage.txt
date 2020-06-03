@@ -1,0 +1,55 @@
+# Window function
+SUM(value) OVER (PARTITION BY field ORDER BY field)
+
+# Partition by
+SELECT  country_id,  year,  gdp,  avg(gdp) over(partition by country_id) AS country_avg_gdp
+FROM country_stats;
+
+SELECT  region,  athlete_name,  total_golds
+FROM
+    (SELECT   region,  name AS athlete_name,  SUM(gold) AS total_golds,
+     ROW_NUMBER() OVER (PARTITION BY region ORDER BY SUM(gold) DESC) AS row_num
+    
+    FROM summer_games_clean AS s
+    JOIN athletes AS a
+    ON a.id = s.athlete_id
+    JOIN countries AS c
+    ON s.country_id = c.id
+    GROUP BY region, athlete_name) AS subquery
+WHERE row_num = 1;
+
+
+# Percentage of GDP per region
+SELECT  region,  country,  
+                    SUM(gdp) AS country_gdp,
+                    SUM(SUM(gdp)) OVER () AS global_gdp,
+                    SUM(gdp) / SUM(SUM(gdp)) OVER () AS perc_global_gdp,
+                    SUM(gdp) / SUM(SUM(gdp)) OVER (partition by region) AS perc_region_gdp
+FROM country_stats AS cs
+JOIN countries AS c
+ON cs.country_id = c.id
+WHERE gdp IS NOT NULL
+GROUP BY region, country
+ORDER BY country_gdp DESC;
+
+
+SELECT   region,  country,
+    SUM(gdp) / SUM(pop_in_millions) AS gdp_per_million,
+    SUM(SUM(gdp)) OVER () / SUM(SUM(pop_in_millions)) OVER () AS gdp_per_million_total,
+    (SUM(gdp) / SUM(pop_in_millions))  /  (SUM(SUM(gdp)) OVER () / SUM(SUM(pop_in_millions)) OVER ()) AS performance_index
+FROM country_stats_clean AS cs
+JOIN countries AS c 
+ON cs.country_id = c.id
+WHERE year = '2016-01-01' AND gdp IS NOT NULL
+GROUP BY region, country
+ORDER BY gdp_per_million DESC;
+
+
+
+
+
+
+
+
+
+
