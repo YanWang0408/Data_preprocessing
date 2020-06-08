@@ -1,0 +1,8 @@
+# Load trainsched.txt
+df = spark.read.csv("trainsched.txt", header=True)
+
+# Create temporary table called table1
+df.createOrReplaceTempView("table1")
+
+# Inspect the columns in the table df - schedule is the table name
+spark.sql("DESCRIBE schedule").show()
