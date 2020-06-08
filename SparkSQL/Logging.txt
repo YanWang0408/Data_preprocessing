@@ -1,0 +1,18 @@
+# logging
+import logging
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s')
+
+logging.debug("text_df columns: %s", text_df.columns)
+
+logging.info("table1 is cached: %s", spark.catalog.isCached(tableName="table1"))
+
+logging.warning("The first row of text_df:\n %s", text_df.first())
+
+logging.error("Selected columns: %s", text_df.select("id", "word"))
+
+logging.debug("text_df columns: %s", text_df.columns)
+logging.info("table1 is cached: %s", spark.catalog.isCached(tableName="table1"))
+logging.error("Selected columns: %s", text_df.select("id", "word"))
+logging.info("Tables: %s", spark.sql("SHOW tables").collect())
+logging.debug("First row: %s", spark.sql("SELECT * FROM table1 LIMIT 1"))
