@@ -1,0 +1,27 @@
+1. docker run repository: tag command [arguments]
+     docker run busybox: 1.24 echo "hello world"
+
+2. docker images
+
+3. docker run busybox:1.24 ls /
+
+4. docker run -i -t busybox:1.24
+     # the -i flag starts an interactive container; 
+     # the -t flag creates a pseudo -TTY that attaches stdin and stdout.
+
+5. 
+Images: 
+     Images: Images are read only templates used to create containers. 
+     Images are created with the docker build command, wither by us or by other docker users.
+     Images are composed of layers of other images.
+     Images are stored in a Docker registry.
+Containers: 
+     Containers: if image is a class, then a container is an instance of a class - a runtime obkect.
+     Containers are lightweight and portable encapsulations of an environment in which to run applications.
+     Containers are created from images. Inside a container, it has all the binaries and dependencies needed to run the application.
+Registries and Repositories:
+     A registry is where we store our images.
+     You can host your own registry, or you can use Docker's public registry which is called DockerHub.
+     Inside a registry, images are stored in repositories.
+     Docker repository is a collection of different dcker images with the same name, that have different tags, each tag usually represents a different version of the image.
+
