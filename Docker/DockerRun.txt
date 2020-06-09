@@ -23,5 +23,6 @@ Registries and Repositories:
      A registry is where we store our images.
      You can host your own registry, or you can use Docker's public registry which is called DockerHub.
      Inside a registry, images are stored in repositories.
-     Docker repository is a collection of different dcker images with the same name, that have different tags, each tag usually represents a different version of the image.
+     Docker repository is a collection of different dcker images with the same name, that have different tags, 
+     each tag usually represents a different version of the image.
 
